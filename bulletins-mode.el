@@ -88,12 +88,16 @@
 (defun fetch-urls-interactive ()
   "Read URLs from the minibuffer until an empty line is entered, then fetch them into the current buffer."
   (interactive)
-  (fetch-urls-to-current-buffer (interactively-read-urls)))
+  (fetch-urls-to-current-buffer (interactively-read-urls))
+  (highlight-80-dashes)
+  (buttonize-buffer-with-cves (current-buffer)))
 
 (defun fetch-urls-from-urls-buffer ()
   "Read URLs from the 'urls' buffer, and fetch them into the current buffer."
   (interactive)
-  (fetch-urls-to-current-buffer (get-urls-from-urls-buffer)))
+  (fetch-urls-to-current-buffer (get-urls-from-urls-buffer))
+  (highlight-80-dashes)
+  (buttonize-buffer-with-cves (current-buffer)))
 
 
 ;;
