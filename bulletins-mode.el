@@ -140,15 +140,13 @@
       (while (re-search-forward "CVE-[[:digit:]]\\{4\\}-[[:digit:]]\\{4,\\}" nil t)
         (let* ((start (match-beginning 0))
                (end (match-end 0))
-               (cve (buffer-substring start end))
-               (lexical-binding t))
-          (make-button (match-beginning 0) (match-end 0)
+               (cve (buffer-substring start end)))
+          (make-button start end
                        'url (format "https://nvd.nist.gov/vuln/detail/%s" cve)
-                       'action (lambda (button)
-                                 (let ((url (button-get button 'url)))
-                                   (shell-command (format "open '%s'" url)))
-                                 'help-echo (format "Visit %s at NVD" cve))))))))
-;(buttonize-buffer-with-cves "Bulletin.txt")
+                       'help-echo (format "Visit %s at NVD" cve)
+                       'action (lambda (button) (shell-command (format "open '%s'" (button-get button 'url))))
+                       'follow-link t
+                       ))))))
 
 
 ;;;###autoload
