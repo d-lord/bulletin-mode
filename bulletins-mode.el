@@ -146,7 +146,7 @@
           (make-button start end
                        'url (format "https://nvd.nist.gov/vuln/detail/%s" cve)
                        'help-echo (format "Visit %s at NVD" cve)
-                       'action (lambda (button) (shell-command (format "open '%s'" (button-get button 'url))))
+                       'action (lambda (button) (call-process "open" nil 0 nil (button-get button 'url)))
                        'follow-link t
                        ))))))
 
