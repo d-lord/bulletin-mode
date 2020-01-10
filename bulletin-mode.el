@@ -1,6 +1,6 @@
 (require 's)
 
-(defvar-local bulletins-mode-marks nil
+(defvar-local bulletin-mode-marks nil
   "Marks denoting the start of each bulletin in the buffer.")
 
 ;;
@@ -9,10 +9,10 @@
 
 (defun make-bulletin-separator ()
   "Return a propertized string to separate bulletins (including blank lines)."
-  ;; May have replaced the (un)?highlight-80-dashes functions.
+  ;; Has replaced the (un)?highlight-80-dashes functions.
   (concat "\n\n"
           (propertize (make-string 80 ?-)
-                      'face 'hi-yellow)
+                      'font-lock-face 'highlight)
           ;; can choose other faces (colours) with M-x list-faces-display
           "\n\n"))
 
@@ -53,20 +53,22 @@
     (reverse urls)))
 
 (defun fetch-urls-to-current-buffer (urls)
-  "Comparable to `dashcat <(sexier-tables http://a) <(sexier-tables http://b) ...`. Also sets bulletins-mode-marks and uses a progress reporter."
+  "Comparable to `dashcat <(sexier-tables http://a) <(sexier-tables http://b) ...`. Also sets bulletin-mode-marks and uses a progress reporter."
   (interactive)
-  (setq bulletins-mode-marks nil)
+  (setq bulletin-mode-marks nil)
   (let* ((separator (make-bulletin-separator))
-	(first-loop t)
-	(progress-reporter (make-progress-reporter "Fetching advisories..." 1 (length urls)))) ;; useless until we start updating it inside the url loop
+         (first-loop t)
+         (progress-reporter (make-progress-reporter "Fetching advisories..." 1 (length urls))) ;; useless until we start updating it inside the url loop
+         (i 0))
     (dolist (url urls)
-      (unless first-loop (insert separator))
-      (push (point-marker) bulletins-mode-marks)
+      (unless (= i 0)(insert separator))
+      (push (point-marker) bulletin-mode-marks)
       (call-process "sexier-tables" nil t nil url)
-      (setq first-loop nil)
+      (incf i)
+      (progress-reporter-update progress-reporter i)
       )
     (progress-reporter-done progress-reporter))
-    (setq bulletins-mode-marks (nreverse bulletins-mode-marks)))
+    (setq bulletin-mode-marks (nreverse bulletin-mode-marks)))
 
 (defun fetch-urls-interactive ()
   "Read URLs from the minibuffer until an empty line is entered, then fetch them into the current buffer."
@@ -86,11 +88,11 @@
 ;;
 
 (defun previous-bulletin (pos)
-  "Searches the bulletins-mode-marks list for the latest mark before 'pos'."
+  "Searches the bulletin-mode-marks list for the latest mark before 'pos'."
   (car (reverse (seq-take-while
 		     #'(lambda (elem) (< elem pos))
-		     bulletins-mode-marks)))
-  ;; what if bulletins-mode-marks is empty?
+		     bulletin-mode-marks)))
+  ;; what if bulletin-mode-marks is empty?
   )
 
 (defun goto-previous-bulletin ()
@@ -103,8 +105,8 @@
       (message "No previous bulletin"))))
 
 (defun next-bulletin (pos)
-  "Searches the bulletins-mode-marks list for the first mark after 'pos'."
-  (car (seq-drop-while #'(lambda (elem) (not (> elem pos))) bulletins-mode-marks)))
+  "Searches the bulletin-mode-marks list for the first mark after 'pos'."
+  (car (seq-drop-while #'(lambda (elem) (not (> elem pos))) bulletin-mode-marks)))
 
 (defun goto-next-bulletin ()
   "Jump to the next bulletin after point."
@@ -134,30 +136,55 @@
                        ))))))
 
 
+;; font lock aka syntax highlighting
+;; http://ergoemacs.org/emacs/elisp_font_lock_mode.html
+(defcustom bulletin-mode-line-separator-face
+  font-lock-warning-face
+  "Face for the separator line between bulletins."
+  :type 'face
+  :group 'bulletin)
+
+; build the mode's map which will be set as font-lock-defaults
+(defvar bulletin-mode-highlights nil)
+(setq bulletin-mode-highlights
+      '(("^-\\{80\\}$" . bulletin-mode-line-separator-face)))
+
+;;
+;; core
+;; https://www.gnu.org/software/emacs/manual/html_node/elisp/Derived-Modes.html
+;;
+
+(defvar bulletin-mode-map
+  (let ((map (make-sparse-keymap)))
+    (define-key map (kbd "C-c f") 'fetch-urls-interactive)
+    (define-key map (kbd "C-c g") 'fetch-urls-from-urls-buffer)
+    (define-key map (kbd "C-M-p") 'goto-previous-bulletin)
+    (define-key map (kbd "C-M-n") 'goto-next-bulletin)
+    map))
+
+;; much of the below is drawn from: https://www.gnu.org/software/emacs/manual/html_node/elisp/Major-Mode-Conventions.html#Major-Mode-Conventions
 ;;;###autoload
-(define-minor-mode bulletins-mode
+(define-derived-mode bulletin-mode text-mode "Bulletin"
   "Create AusCERT bulletins with style."
-  :init-value nil
-  :lighter " Bulletin"
-  :keymap (let ((map (make-sparse-keymap)))
-	    (define-key map (kbd "C-c f") 'fetch-urls-interactive)
-	    (define-key map (kbd "C-c g") 'fetch-urls-from-urls-buffer)
-	    (define-key map (kbd "C-c r") (lambda () "Run 80-dash line highlighting." (interactive) (progn (unhighlight-80-dashes) (highlight-80-dashes)))) ; annoying constraints this addresses: highlighting is done once, not constantly; existing highlighting must be cleared before running highlighting will do anything. (is Hi-Lock just screwy?) But does have the problem that you can insert at the start of the line to get extra highlighting (the contamination spreads!).
-	    ;; Not sure these two are exactly like their counterparts in other modes, but let's give it a go anyway.
-	    (define-key map (kbd "C-M-p") 'goto-previous-bulletin)
-	    (define-key map (kbd "C-M-n") 'goto-next-bulletin)
-	    map)
+  :group 'bulletin
+  (setq font-lock-defaults '(bulletin-mode-highlights))
   )
+
 ;; features to add:
 ;; - detecting duplicate URLs in both entry modes
 ;; - interpreting an existing bulletin from text (not one created by the fetch commands)
 ;; - make it an emacs package/spacemacs layer and put it in source control (private github repo?)
 ;; fuzzy feature ideas:
-;; - annotate after bulletin IDs with metadata (what kind?), plus a link
+;; - annotate after bulletin IDs with metadata (what kind? requires API or scraping), plus a link (easy)
 ;; - syntax highlighting for AusCERT preamble. not especially useful though
 ;; - option to open a referenced bulletin in a new buffer
 ;;   - HTTP and HTML parsing in elisp? or shell out/ffi to a python/rust program?
 ;;   - HTTPS session reuse would be nice
 
+
+; ideally this regex would start with \\`, but it appears that simply cannot match in this context [dal 10/01/2020]
+(add-to-list 'auto-mode-alist '("Bulletin\\.txt\\'" . bulletin-mode))
+
 ;;;###autoload
-(provide 'bulletins-mode)
+(provide 'bulletin-mode)
+
