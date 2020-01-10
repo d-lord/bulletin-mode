@@ -2,7 +2,7 @@
   "Marks denoting the start of each bulletin in the buffer.")
 
 ;;
-;; highlight-80-dashes functions (may be worthless with the advent of propertized strings)
+;; functions for the 80-dash separator (AusCERT convention)
 ;;
 
 (defun highlight-80-dashes (&optional color)
