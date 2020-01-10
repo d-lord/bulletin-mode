@@ -164,7 +164,6 @@
 	    (define-key map (kbd "C-M-p") 'goto-previous-bulletin)
 	    (define-key map (kbd "C-M-n") 'goto-next-bulletin)
 	    map)
-  (if bulletins-mode (highlight-80-dashes) (unhighlight-80-dashes))
   )
 ;; features to add:
 ;; - detecting duplicate URLs in both entry modes
