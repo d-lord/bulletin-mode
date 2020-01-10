@@ -5,6 +5,15 @@
 ;; functions for the 80-dash separator (AusCERT convention)
 ;;
 
+(defun make-bulletin-separator ()
+  "Return a propertized string to separate bulletins (including blank lines)."
+  ;; May have replaced the (un)?highlight-80-dashes functions.
+  (concat "\n\n"
+          (propertize (make-string 80 ?-)
+                      'face 'hi-yellow)
+          ;; can choose other faces (colours) with M-x list-faces-display
+          "\n\n"))
+
 (defun highlight-80-dashes (&optional color)
   "Set a line of exactly 80 dashes to be highlighted."
   (interactive)
@@ -18,14 +27,9 @@
   "Undo highlight-80-dashes."
   (unhighlight-regexp "^-\\{80\\}$"))
 
-(defun make-bulletin-separator ()
-  "Return a propertized string to separate bulletins (including blank lines)."
-  ;; May have replaced the (un)?highlight-80-dashes functions.
-  (concat "\n\n"
-	  (propertize (make-string 80 ?-)
-		      'face 'hi-yellow)
-	  ;; can choose other faces (colours) with M-x list-faces-display
-	  "\n\n"))
+
+(make-obsolete 'highlight-80-dashes 'make-bulletin-separator)
+
 
 ;;
 ;; s-trim* functions borrowed, in not quite strict compliance with GPL 3, from:
@@ -178,8 +182,6 @@
 
 ;;;###autoload
 
-
-(make-obsolete 'highlight-80-dashes 'make-bulletin-separator)
 
 
 (provide 'bulletins-mode)
