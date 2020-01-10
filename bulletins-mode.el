@@ -23,7 +23,7 @@
   ;; May have replaced the (un)?highlight-80-dashes functions.
   (concat "\n\n"
 	  (propertize (make-string 80 ?-)
-		      'font-lock-face 'hi-yellow)
+		      'face 'hi-yellow)
 	  ;; can choose other faces (colours) with M-x list-faces-display
 	  "\n\n"))
 
@@ -89,14 +89,12 @@
   "Read URLs from the minibuffer until an empty line is entered, then fetch them into the current buffer."
   (interactive)
   (fetch-urls-to-current-buffer (interactively-read-urls))
-  (highlight-80-dashes)
   (buttonize-buffer-with-cves (current-buffer)))
 
 (defun fetch-urls-from-urls-buffer ()
   "Read URLs from the 'urls' buffer, and fetch them into the current buffer."
   (interactive)
   (fetch-urls-to-current-buffer (get-urls-from-urls-buffer))
-  (highlight-80-dashes)
   (buttonize-buffer-with-cves (current-buffer)))
 
 
@@ -161,7 +159,7 @@
   :keymap (let ((map (make-sparse-keymap)))
 	    (define-key map (kbd "C-c f") 'fetch-urls-interactive)
 	    (define-key map (kbd "C-c g") 'fetch-urls-from-urls-buffer)
-	    (define-key map (kbd "C-c r") (lambda () "Run 80-dash line highlighting." (interactive) (progn (unhighlight-80-dashes) (highlight-80-dashes)))) ; annoying constraints this addresses: highlighting is done once, not constantly; existing highlighting must be cleared before running highlighting will do anything. (is Hi-Lock just screwy?)
+	    (define-key map (kbd "C-c r") (lambda () "Run 80-dash line highlighting." (interactive) (progn (unhighlight-80-dashes) (highlight-80-dashes)))) ; annoying constraints this addresses: highlighting is done once, not constantly; existing highlighting must be cleared before running highlighting will do anything. (is Hi-Lock just screwy?) But does have the problem that you can insert at the start of the line to get extra highlighting (the contamination spreads!).
 	    ;; Not sure these two are exactly like their counterparts in other modes, but let's give it a go anyway.
 	    (define-key map (kbd "C-M-p") 'goto-previous-bulletin)
 	    (define-key map (kbd "C-M-n") 'goto-next-bulletin)
@@ -180,6 +178,9 @@
 ;;   - HTTPS session reuse would be nice
 
 ;;;###autoload
-;;(add-hook 'bulletins-mode 'hi-lock-mode)
+
+
+(make-obsolete 'highlight-80-dashes 'make-bulletin-separator)
+
 
 (provide 'bulletins-mode)
