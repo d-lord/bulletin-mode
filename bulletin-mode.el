@@ -183,6 +183,15 @@
 ;; - option to open a referenced bulletin in a new buffer
 ;;   - HTTP and HTML parsing in elisp? or shell out/ffi to a python/rust program?
 ;;   - HTTPS session reuse would be nice
+;; - making URLs clickable (enable goto-address-mode?)
+;;   - without adding buttons to URLs containing CVE IDs (otherwise you get a different result depending whether you click the start of the URL or the bit with the CVE in it)
+;;   - maybe also make C-tab and C-S-tab go to them as well as the CVE buttons
+;; - clearly share functionality and distinguish between creation mode and review mode (s?). at the moment, separators in review mode don't get any special treatment (highlighting, jumping), maybe other issues too.
+;; - automatically buttonize buffer when bulletins mode is activated (there's gotta be a simple way to do it, just idk it)
+;; - review mode: detect bulletin ID and rename buffer or frame to it
+;; - add a second click to buttonize to make it search @ auscert's site instead of NVD
+;; - make AusCERT IDs also clickable
+;; - include separate bulletins in the imenu (not sure how to name them, though - grab the first paragraph and join it? too long? probably would be for IBM)
 
 
 ; ideally this regex would start with \\`, but it appears that simply cannot match in this context [dal 10/01/2020]
