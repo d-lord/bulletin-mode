@@ -65,10 +65,10 @@
       (push (point-marker) bulletin-mode-marks)
       (call-process "sexier-tables" nil t nil url)
       (incf i)
-      (progress-reporter-update progress-reporter i)
-      )
+      (progress-reporter-update progress-reporter i))
     (progress-reporter-done progress-reporter))
-    (setq bulletin-mode-marks (nreverse bulletin-mode-marks)))
+  (setq bulletin-mode-marks (nreverse bulletin-mode-marks)))
+  ; might also be worth replacing /^\s+$/ with // all through the document (to avoid w3m weirdnesses like \n\n\t\n)
 
 (defun fetch-urls-interactive ()
   "Read URLs from the minibuffer until an empty line is entered, then fetch them into the current buffer."
@@ -120,6 +120,7 @@
 
 (defun buttonize-buffer-with-cves (bufname)
   "Mark CVEs in a given buffer as hyperlinks."
+  ; would be nice if they could be right-clicked (or some other option) to visit AusCERT's version instead
   (interactive "bBuffer to add CVE buttons to: ")
   (save-excursion
     (with-current-buffer bufname
@@ -189,9 +190,9 @@
 ;; - clearly share functionality and distinguish between creation mode and review mode (s?). at the moment, separators in review mode don't get any special treatment (highlighting, jumping), maybe other issues too.
 ;; - automatically buttonize buffer when bulletins mode is activated (there's gotta be a simple way to do it, just idk it)
 ;; - review mode: detect bulletin ID and rename buffer or frame to it
-;; - add a second click to buttonize to make it search @ auscert's site instead of NVD
 ;; - make AusCERT IDs also clickable
 ;; - include separate bulletins in the imenu (not sure how to name them, though - grab the first paragraph and join it? too long? probably would be for IBM)
+;; interface to choose URLs from a block of text (i.e. ProNG's email view to pick the meaningful advisory URL from IBM's emails)
 
 
 ; ideally this regex would start with \\`, but it appears that simply cannot match in this context [dal 10/01/2020]
