@@ -169,8 +169,9 @@
 (define-derived-mode bulletin-mode text-mode "Bulletin"
   "Create AusCERT bulletins with style."
   :group 'bulletin
+  :after-hook (buttonize-buffer-with-cves (current-buffer))
   (setq font-lock-defaults '(bulletin-mode-highlights))
-  )
+)
 
 ;; features to add:
 ;; - detecting duplicate URLs in both entry modes
