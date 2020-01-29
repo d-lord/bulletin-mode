@@ -160,6 +160,8 @@
     (define-key map (kbd "C-c g") 'fetch-urls-from-urls-buffer)
     (define-key map (kbd "C-M-p") 'goto-previous-bulletin)
     (define-key map (kbd "C-M-n") 'goto-next-bulletin)
+    (define-key map (kbd "<C-tab>") 'forward-button)
+    (define-key map (kbd "<C-S-tab>") 'backward-button)
     map))
 
 ;; much of the below is drawn from: https://www.gnu.org/software/emacs/manual/html_node/elisp/Major-Mode-Conventions.html#Major-Mode-Conventions
