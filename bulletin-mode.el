@@ -186,8 +186,8 @@
 
 
 ; ideally this regex would start with \\`, but it appears that simply cannot match in this context [dal 10/01/2020]
+;;;###autoload
 (add-to-list 'auto-mode-alist '("Bulletin\\.txt\\'" . bulletin-mode))
 
 ;;;###autoload
 (provide 'bulletin-mode)
-
