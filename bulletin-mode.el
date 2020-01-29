@@ -5,16 +5,16 @@
 
 ;;
 ;; functions for the 80-dash separator (AusCERT convention)
+;; idea: could this be an emacs 'page separator' and render as a pretty horizontal line like page-break-lines-mode but still copy out as 80 dashes?
+;;       would likely involve either copying from page-break-lines-mode or sneaking 80 dashes into the buffer display table there
+;;       (I just read that code quickly, idk much about it)
+;;       the other option is to use a ^L char directly and have it copy out as dashes, not sure which is more reliable
 ;;
 
 (defun make-bulletin-separator ()
-  "Return a propertized string to separate bulletins (including blank lines)."
-  ;; Has replaced the (un)?highlight-80-dashes functions.
-  (concat "\n\n"
-          (propertize (make-string 80 ?-)
-                      'font-lock-face 'highlight)
-          ;; can choose other faces (colours) with M-x list-faces-display
-          "\n\n"))
+  "Return a standard string of 80 dashes to separate bulletins (plus blank lines)."
+  ;; The dashes should be displayed as special syntax. (font-lock face?)
+  (concat "\n\n" (make-string 80 ?-) "\n\n"))
 
 (defun highlight-80-dashes (&optional color)
   "Set a line of exactly 80 dashes to be highlighted."
