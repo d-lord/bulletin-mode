@@ -137,6 +137,22 @@
                        ))))))
 
 
+(defun set-id-title-and-buffer-name (bufname)
+  "Parse the AusCERT metadata to set bulletin ID and product name, and set the buffer name based on those."
+  ;; if another buffer exists with that name already, this will fail, and that condition is likely if the review process touches the same bulletin multiple times.
+  (save-excursion
+    (with-current-buffer bufname
+      (goto-char (point-min))
+      (re-search-forward "[AE]SB-[[:digit:]]\\{4\\}\\.[[:digit:]]\\{4\\}\\(\\.[[:digit:]]\\)?" nil t)
+      (setq-local bulletin-id (match-string-no-properties 0))
+      (goto-char (point-min))
+      (re-search-forward "^Product:\s+\\(.*\\)" nil t)
+      (setq-local bulletin-product (match-string-no-properties 1))
+      ;; it'd be nice if product were products plural, but I'm not messing with that regex right now
+      (rename-buffer (concat bulletin-id ": " bulletin-product)))
+    ))
+
+
 ;; font lock aka syntax highlighting
 ;; http://ergoemacs.org/emacs/elisp_font_lock_mode.html
 (defcustom bulletin-mode-line-separator-face
@@ -170,7 +186,11 @@
 (define-derived-mode bulletin-mode text-mode "Bulletin"
   "Create AusCERT bulletins with style."
   :group 'bulletin
-  :after-hook (buttonize-buffer-with-cves (current-buffer))
+  :after-hook (progn
+                (goto-address-mode)
+                (condition-case nil ; if the rename fails, eg we have multiple buffers about the same draft, don't abort the rest of the after-hook
+                    (set-id-title-and-buffer-name (current-buffer)))
+                (buttonize-buffer-with-cves (current-buffer)))
   (setq font-lock-defaults '(bulletin-mode-highlights))
 )
 
@@ -189,7 +209,7 @@
 ;;   - maybe also make C-tab and C-S-tab go to them as well as the CVE buttons
 ;; - clearly share functionality and distinguish between creation mode and review mode (s?). at the moment, separators in review mode don't get any special treatment (highlighting, jumping), maybe other issues too.
 ;; - automatically buttonize buffer when bulletins mode is activated (there's gotta be a simple way to do it, just idk it)
-;; - review mode: detect bulletin ID and rename buffer or frame to it
+;; - add a second click to buttonize to make it search @ auscert's site instead of NVD
 ;; - make AusCERT IDs also clickable
 ;; - include separate bulletins in the imenu (not sure how to name them, though - grab the first paragraph and join it? too long? probably would be for IBM)
 ;; interface to choose URLs from a block of text (i.e. ProNG's email view to pick the meaningful advisory URL from IBM's emails)
