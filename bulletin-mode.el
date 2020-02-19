@@ -213,6 +213,10 @@
 ;; - make AusCERT IDs also clickable
 ;; - include separate bulletins in the imenu (not sure how to name them, though - grab the first paragraph and join it? too long? probably would be for IBM)
 ;; interface to choose URLs from a block of text (i.e. ProNG's email view to pick the meaningful advisory URL from IBM's emails)
+;; highlight lines past 80 width, like vim's `:colorcolumn 80'
+;; - attainable with the built-in whitespace-mode: https://www.emacswiki.org/emacs/WhiteSpace
+;;   - some customization required... see 'customize-group RET whitespace RET', under 'whitespace styles' - I think I want "lines, only overlong part". and also change the font it uses to a more "error" one (or is that just spacemacs' error font being too subtle? it's just pink with my current theme, not very visible at all)
+;;   - also disable most of those style options for now as I don't want to see tabs, spaces, newlines, etc (and arguably not trailing whitespace either - suspect it's more annoying than helpful)
 
 
 ; ideally this regex would start with \\`, but it appears that simply cannot match in this context [dal 10/01/2020]
