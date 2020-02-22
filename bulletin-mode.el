@@ -30,7 +30,7 @@
   (unhighlight-regexp "^-\\{80\\}$"))
 
 
-(make-obsolete 'highlight-80-dashes 'make-bulletin-separator)
+(make-obsolete 'highlight-80-dashes 'make-bulletin-separator "10/01/20")
 
 
 ;;
