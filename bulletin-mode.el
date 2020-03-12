@@ -188,8 +188,10 @@
   :group 'bulletin
   :after-hook (progn
                 (goto-address-mode)
+                ;; (whitespace-mode) ; for highlighting long lines: just gotta turn off showing newlines, tabs, spaces etc
                 (condition-case nil ; if the rename fails, eg we have multiple buffers about the same draft, don't abort the rest of the after-hook
-                    (set-id-title-and-buffer-name (current-buffer)))
+                    (set-id-title-and-buffer-name (current-buffer))
+                  (error (message "Unable to determine bulletin ID and product from buffer contents")))
                 (buttonize-buffer-with-cves (current-buffer)))
   (setq font-lock-defaults '(bulletin-mode-highlights))
 )
