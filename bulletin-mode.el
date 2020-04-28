@@ -117,7 +117,7 @@
   (interactive)
   (let ((destination (next-bulletin (point))))
     (if destination
-	(goto-char destination)
+        (goto-char destination)
         (message "No next bulletin"))))
 
 (defun buttonize-buffer-with-cves (bufname)
@@ -232,13 +232,15 @@
 ;; - clearly share functionality and distinguish between creation mode and review mode (s?). at the moment, separators in review mode don't get any special treatment (highlighting, jumping), maybe other issues too.
 ;; - automatically buttonize buffer when bulletins mode is activated (there's gotta be a simple way to do it, just idk it)
 ;; - add a second click to buttonize to make it search @ auscert's site instead of NVD
-;; - make AusCERT IDs also clickable
 ;; - include separate bulletins in the imenu (not sure how to name them, though - grab the first paragraph and join it? too long? probably would be for IBM)
 ;; interface to choose URLs from a block of text (i.e. ProNG's email view to pick the meaningful advisory URL from IBM's emails)
 ;; highlight lines past 80 width, like vim's `:colorcolumn 80'
 ;; - attainable with the built-in whitespace-mode: https://www.emacswiki.org/emacs/WhiteSpace
-;;   - some customization required... see 'customize-group RET whitespace RET', under 'whitespace styles' - I think I want "lines, only overlong part". and also change the font it uses to a more "error" one (or is that just spacemacs' error font being too subtle? it's just pink with my current theme, not very visible at all)
+;;   - some customization required... see 'customize-group RET whitespace RET', under 'whitespace styles'
+;;     - I think I want "lines, only overlong part".
+;;     - also change the font face it uses to a more "error" one (it's working by setting "Whitespace line face" although the name of "Whitespace line column" looks more appropriate)
 ;;   - also disable most of those style options for now as I don't want to see tabs, spaces, newlines, etc (and arguably not trailing whitespace either - suspect it's more annoying than helpful)
+;; for review mode: a binding to create a window layout. vertical window split, resize top window from start to "BEGIN INCLUDED TEXT", bottom window fills the rest of the space.
 
 
 ; ideally this regex would start with \\`, but it appears that simply cannot match in this context [dal 10/01/2020]
