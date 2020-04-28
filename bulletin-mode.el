@@ -74,13 +74,15 @@
   "Read URLs from the minibuffer until an empty line is entered, then fetch them into the current buffer."
   (interactive)
   (fetch-urls-to-current-buffer (interactively-read-urls))
-  (buttonize-buffer-with-cves (current-buffer)))
+  (buttonize-buffer-with-cves (current-buffer))
+  (buttonize-buffer-with-bulletin-ids (current-buffer)))
 
 (defun fetch-urls-from-urls-buffer ()
   "Read URLs from the 'urls' buffer, and fetch them into the current buffer."
   (interactive)
   (fetch-urls-to-current-buffer (get-urls-from-urls-buffer))
-  (buttonize-buffer-with-cves (current-buffer)))
+  (buttonize-buffer-with-cves (current-buffer))
+  (buttonize-buffer-with-bulletin-ids (current-buffer)))
 
 
 ;;
@@ -136,6 +138,23 @@
                        'follow-link t
                        ))))))
 
+(defun buttonize-buffer-with-bulletin-ids (bufname)
+  "Mark ESBs/ASBs in a given buffer as hyperlinks."
+  (interactive "bBuffer to add ESB/ASB buttons to: ")
+  (save-excursion
+    (with-current-buffer bufname
+      (goto-char (point-min))
+      (while (re-search-forward "[EA]SB-[[:digit:]]\\{4\\}.[[:digit:]]\\{4\\}\\(.[[:digit:]]\\)?" nil t)
+        (let* ((start (match-beginning 0))
+               (end (match-end 0))
+               (target-bulletin-id (buffer-substring start end)))
+          (make-button start end
+                       'url (format "https://auscert.org.au/bulletins/%s/" target-bulletin-id)
+                       'help-echo (format "Visit %s at AusCERT" target-bulletin-id)
+                       'action (lambda (button) (call-process "open" nil 0 nil (button-get button 'url)))
+                       'follow-link t
+                       )))))
+  )
 
 (defun set-id-title-and-buffer-name (bufname)
   "Parse the AusCERT metadata to set bulletin ID and product name, and set the buffer name based on those."
@@ -192,7 +211,8 @@
                 (condition-case nil ; if the rename fails, eg we have multiple buffers about the same draft, don't abort the rest of the after-hook
                     (set-id-title-and-buffer-name (current-buffer))
                   (error (message "Unable to determine bulletin ID and product from buffer contents")))
-                (buttonize-buffer-with-cves (current-buffer)))
+                (buttonize-buffer-with-cves (current-buffer))
+                (buttonize-buffer-with-bulletin-ids (current-buffer)))
   (setq font-lock-defaults '(bulletin-mode-highlights))
 )
 
