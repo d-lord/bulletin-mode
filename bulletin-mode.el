@@ -48,8 +48,8 @@
     (while (not done)
       (setq url (read-string "URL (empty to finish): "))
       (if (= (length url) 0)
-	  (setq done t)
-	(push url urls)))
+          (setq done t)
+        (push url urls)))
     (reverse urls)))
 
 (defun fetch-urls-to-current-buffer (urls)
@@ -102,9 +102,10 @@
   (interactive)
   (let ((destination (previous-bulletin (point))))
     (if destination
-	(goto-char destination)
-      ;; or go to: first bulletin? point? point-min?
-      (message "No previous bulletin"))))
+        (progn (goto-char destination) (recenter-top-bottom 4))
+      ;; (message "No previous bulletin")
+      (goto-char (point-min))
+      )))
 
 (defun next-bulletin (pos)
   "Searches the bulletin-mode-marks list for the first mark after 'pos'."
@@ -117,8 +118,10 @@
   (interactive)
   (let ((destination (next-bulletin (point))))
     (if destination
-        (goto-char destination)
-        (message "No next bulletin"))))
+        (progn (goto-char destination) (recenter-top-bottom 4))
+      ;; (message "No next bulletin")
+      (goto-char (point-max))
+      )))
 
 
 ;;;
