@@ -120,6 +120,11 @@
         (goto-char destination)
         (message "No next bulletin"))))
 
+
+;;;
+;;; detection
+;;;
+
 (defun buttonize-buffer-with-cves (bufname)
   "Mark CVEs in a given buffer as hyperlinks."
   ; would be nice if they could be right-clicked (or some other option) to visit AusCERT's version instead
@@ -171,6 +176,20 @@
       (rename-buffer (concat bulletin-id ": " bulletin-product)))
     ))
 
+(defun detect-bulletin-separators (bufname)
+  "Parse an existing bulletin to set bulletin-mode-marks."
+  (interactive "bBuffer: ")
+  (save-excursion
+    (with-current-buffer bufname
+      (setq-local bulletin-mode-marks nil)
+      (goto-char (point-min))
+      (re-search-forward "--------------------------BEGIN INCLUDED TEXT--------------------\n" nil t)
+      (push (point-marker) bulletin-mode-marks)
+      (while (re-search-forward (make-bulletin-separator) nil t)
+        (push (match-end 0) bulletin-mode-marks)))
+    (setq bulletin-mode-marks (nreverse bulletin-mode-marks))
+    )
+  bulletin-mode-marks)
 
 ;; font lock aka syntax highlighting
 ;; http://ergoemacs.org/emacs/elisp_font_lock_mode.html
@@ -198,6 +217,7 @@
     (define-key map (kbd "C-M-n") 'goto-next-bulletin)
     (define-key map (kbd "<C-tab>") 'forward-button)
     (define-key map (kbd "<C-S-tab>") 'backward-button)
+    (define-key map (kbd "C-c s") 'detect-bulletin-separators)
     map))
 
 ;; much of the below is drawn from: https://www.gnu.org/software/emacs/manual/html_node/elisp/Major-Mode-Conventions.html#Major-Mode-Conventions
@@ -212,7 +232,8 @@
                     (set-id-title-and-buffer-name (current-buffer))
                   (error (message "Unable to determine bulletin ID and product from buffer contents")))
                 (buttonize-buffer-with-cves (current-buffer))
-                (buttonize-buffer-with-bulletin-ids (current-buffer)))
+                (buttonize-buffer-with-bulletin-ids (current-buffer))
+                (detect-bulletin-separators (current-buffer)))
   (setq font-lock-defaults '(bulletin-mode-highlights))
 )
 
